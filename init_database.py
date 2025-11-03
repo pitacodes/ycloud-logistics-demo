@@ -8,8 +8,10 @@ import sqlite3
 import random
 from datetime import datetime, timedelta
 
+import os
+
 # 数据库文件路径
-DB_PATH = '/home/ubuntu/logistics_demo/logistics.db'
+DB_PATH = os.environ.get('DB_PATH', '/tmp/logistics.db')
 
 # 示例数据
 CUSTOMER_NAMES = [

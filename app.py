@@ -12,8 +12,10 @@ import sqlite3
 from datetime import datetime
 import uvicorn
 
+import os
+
 # 数据库路径
-DB_PATH = '/home/ubuntu/logistics_demo/logistics.db'
+DB_PATH = os.environ.get('DB_PATH', '/tmp/logistics.db')
 
 # 创建 FastAPI 应用
 app = FastAPI(
@@ -334,10 +336,24 @@ async def health_check():
             }
         )
 
+def init_db_if_needed():
+    """如果数据库不存在则初始化"""
+    if not os.path.exists(DB_PATH):
+        print(f"数据库不存在，正在初始化: {DB_PATH}")
+        import subprocess
+        subprocess.run(["python3", "init_database.py"], check=True)
+        print("数据库初始化完成")
+
 if __name__ == "__main__":
+    # 启动前检查并初始化数据库
+    init_db_if_needed()
+    
+    # 获取端口（Railway 会设置 PORT 环境变量）
+    port = int(os.environ.get("PORT", 8000))
+    
     uvicorn.run(
         "app:app",
         host="0.0.0.0",
-        port=8000,
+        port=port,
         reload=False
     )
